@@ -39,6 +39,8 @@ MODULE_LICENSE("GPL");
 static int cloud_open(struct inode *inode, struct file *file);
 static long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 int cloud_release(struct inode *inode, struct file *filp);
+static int send_signals(void);
+
 
 const struct file_operations cloud_operations =
 {
@@ -51,11 +53,28 @@ int cloud_open(struct inode *inode, struct file *file)
     printk(KERN_ALERT "CloudUSB file open function called\n");
     return 0;
 }
-extern loff_t file_offset;
-extern unsigned int amount;
-extern int cloud_flag;
-extern char *buf;
-extern ssize_t nread;
+//extern loff_t file_offset;
+//extern unsigned int amount;
+//extern int cloud_flag;
+//extern char *buf;
+//extern ssize_t nread;
+
+int cloud_flag = 0;
+unsigned int		amount = 0;
+loff_t			file_offset = 0;
+ssize_t			nread = 0;
+
+char *buf = NULL;
+
+EXPORT_SYMBOL(amount);
+EXPORT_SYMBOL(file_offset);
+EXPORT_SYMBOL(nread);
+
+EXPORT_SYMBOL(cloud_flag);
+EXPORT_SYMBOL(buf);
+
+EXPORT_SYMBOL(send_signals);
+
 struct task_struct *t;
 struct siginfo info;
 int user_pid;
@@ -91,12 +110,20 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             cloud_flag = 0;
             break;
     }
-    while(!cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 블록요청 들어올때까지 기다림.
+//    while(!cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 블록요청 들어올때까지 기다림.
+//    inits->amount = amount;
+//    inits->file_offset = file_offset;
+//    send_sig_info(SIGCONT, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
+    return 0;
+}
+
+static int send_signals(void){
     inits->amount = amount;
     inits->file_offset = file_offset;
     send_sig_info(SIGCONT, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
     return 0;
 }
+
 int cloud_release(struct inode *inode, struct file *filp) {
     printk (KERN_ALERT "Inside close \n");
     return 0;

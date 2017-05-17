@@ -1,4 +1,4 @@
-KBUILD_EXTRA_SYMBOLS := /lib/modules/4.4.50+/source/drivers/usb/gadget/Module.symvers
+KBUILD_EXTRA_SYMBOLS := /lib/modules/4.4.50-v7+/source/drivers/usb/gadget/Module.symvers
 obj-m += mymodule.o
 
 all:

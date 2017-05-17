@@ -638,21 +638,30 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 
 
 /*-------------------------------------------------------------------------*/
+extern void send_signals(void);
 
-int cloud_flag = 0;
-unsigned int		amount = 0;
-loff_t			file_offset = 0;
-ssize_t			nread = 0;
+//int cloud_flag = 0;
+//unsigned int		amount = 0;
+//loff_t			file_offset = 0;
+//ssize_t			nread = 0;
+//
+//char *buf = NULL;
+//
+//// export할것: amount, file_offset, cloud_flag, buf,
+//EXPORT_SYMBOL(amount);
+//EXPORT_SYMBOL(file_offset);
+//EXPORT_SYMBOL(nread);
+//
+//EXPORT_SYMBOL(cloud_flag);
+//EXPORT_SYMBOL(buf);
 
-char *buf = NULL;
 
-// export할것: amount, file_offset, cloud_flag, buf,
-EXPORT_SYMBOL(amount);
-EXPORT_SYMBOL(file_offset);
-EXPORT_SYMBOL(nread);
+extern loff_t file_offset;
+extern unsigned int amount;
+extern int cloud_flag;
+extern char *buf;
+extern ssize_t nread;
 
-EXPORT_SYMBOL(cloud_flag);
-EXPORT_SYMBOL(buf);
 
 static int do_read(struct fsg_common *common)
 {
@@ -727,7 +736,7 @@ static int do_read(struct fsg_common *common)
 			break;
 		}
         
-        cloud_flag = 1;
+        send_signals();
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
         strncpy(bh->buf, buf, nread);
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
