@@ -638,7 +638,7 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 
 
 /*-------------------------------------------------------------------------*/
-extern void send_signals(void);
+//extern void send_signals(void);
 
 //int cloud_flag = 0;
 //unsigned int		amount = 0;
@@ -661,6 +661,8 @@ extern unsigned int amount;
 extern int cloud_flag;
 extern char *buf;
 extern ssize_t nread;
+
+
 
 
 static int do_read(struct fsg_common *common)
@@ -736,7 +738,8 @@ static int do_read(struct fsg_common *common)
 			break;
 		}
         
-        send_signals();
+        //send_signals();
+        cloud_flag = 1;
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
         strncpy(bh->buf, buf, nread);
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
