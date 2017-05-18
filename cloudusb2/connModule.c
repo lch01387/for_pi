@@ -92,7 +92,7 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             inits = (struct module_init *)(arg);
             user_pid = inits->pid;
             memset(&info, 0 ,sizeof(struct siginfo));
-            info.si_signo = SIGCONT;
+            info.si_signo = SIGUSR1;
             info.si_code = SI_QUEUE;
             rcu_read_lock();
             //t = find_task_by_vpid(user_pid);
@@ -112,11 +112,12 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             //buff = files->buf;
             printk(KERN_ALERT "CloudUSB RETURN_FILE files->buf: ");
             int i;
-            for(i=0;i<nread;i++){
-                printk(KERN_CONT "%02x ", files->buf[i]);
+            printk(KERN_ALERT "%d\n", files->nread);
+            for(i=0;i<512;i++){
+                printk(KERN_CONT "_%d_%02x ", i, files->buf[i]);
             }
             printk(KERN_ALERT "\n");
-            strncpy(buff, files->buf, files->nread);
+            strncpy(buff, files->buf, sizeof(unsigned char)*512);
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
             nread = files->nread;
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE2\n");
@@ -129,7 +130,7 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
     inits->amount = amount;
     printk(KERN_ALERT "CloudUSB after loop2\n");
     inits->file_offset = file_offset;
-    send_sig_info(SIGCONT, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
+    send_sig_info(SIGUSR1, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
     return 0;
 }
 
