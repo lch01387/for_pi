@@ -740,8 +740,11 @@ static int do_read(struct fsg_common *common)
         
         //send_signals();
         cloud_flag = 1;
+        printk(KERN_ALERT "CloudUSB f_mass before loop amount:%d\n", amount);
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
+        printk(KERN_ALERT "CloudUSB f_mass after loop1\n");
         strncpy(bh->buf, buf, nread);
+        printk(KERN_ALERT "CloudUSB f_mass after loop2\n");
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
         /* Perform the read */
 //        file_offset_tmp = file_offset;

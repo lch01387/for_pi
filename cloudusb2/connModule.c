@@ -107,15 +107,20 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 //          send_sig_info(SIGCONT, &info, t);
             break;
         case RETURN_FILE:
-            //printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE\n");
+            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE\n");
             files = (struct return_file *)(arg);
             buf = files->buf;
+            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
             nread = files->nread;
+            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE2\n");
             cloud_flag = 0;
             break;
     }
+    printk(KERN_ALERT "CloudUSB before loop\n");
     while(!cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 블록요청 들어올때까지 기다림.
+    printk(KERN_ALERT "CloudUSB after loop1\n");
     inits->amount = amount;
+    printk(KERN_ALERT "CloudUSB after loop2\n");
     inits->file_offset = file_offset;
     send_sig_info(SIGCONT, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
     return 0;
