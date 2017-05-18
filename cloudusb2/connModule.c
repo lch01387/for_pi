@@ -2,6 +2,7 @@
 #include <linux/kernel.h>
 #include <linux/cdev.h>
 #include <linux/fs.h>
+#include <linux/string.h>
 
 
 //#include <sys/types.h>
@@ -117,7 +118,7 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
                 printk(KERN_CONT "_%d_%02x ", i, files->buf[i]);
             }
             printk(KERN_ALERT "\n");
-            strncpy(buff, files->buf, sizeof(unsigned char)*files->nread);
+            memcpy(buff, files->buf, sizeof(unsigned char)*files->nread);
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
             nread = files->nread;
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE2\n");
