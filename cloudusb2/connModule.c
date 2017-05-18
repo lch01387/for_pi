@@ -25,7 +25,7 @@ struct module_init{
 };
 
 struct return_file{
-    char *buf;
+    unsigned char *buf;
     int nread;
 };
 
@@ -110,6 +110,12 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE\n");
             files = (struct return_file *)(arg);
             //buff = files->buf;
+            printk(KERN_ALERT "CloudUSB RETURN_FILE files->buf: ");
+            int i;
+            for(i=0;i<nread;i++){
+                printk(KERN_CONT "%02x ", files->buf[i]);
+            }
+            printk(KERN_ALERT "\n");
             strncpy(buff, files->buf, files->nread);
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
             nread = files->nread;
