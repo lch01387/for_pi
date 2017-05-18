@@ -65,7 +65,7 @@ unsigned int		amount = 0;
 loff_t			file_offset = 0;
 ssize_t			nread = 0;
 
-char buff[1024];
+char buff[16384];
 
 EXPORT_SYMBOL(amount);
 EXPORT_SYMBOL(file_offset);
