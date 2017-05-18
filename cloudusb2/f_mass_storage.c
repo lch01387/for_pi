@@ -750,7 +750,7 @@ static int do_read(struct fsg_common *common)
         }
         printk(KERN_ALERT "\n");
         printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
-        strncpy(bh->buf, buff, nread);
+        strncpy(bh->buf, buff, sizeof(unsigned char)*nread);
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
         /* Perform the read */
 //        file_offset_tmp = file_offset;
