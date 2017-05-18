@@ -659,7 +659,7 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 extern loff_t file_offset;
 extern unsigned int amount;
 extern int cloud_flag;
-extern char *buff;
+extern char buff[1024];
 extern ssize_t nread;
 
 
@@ -742,12 +742,10 @@ static int do_read(struct fsg_common *common)
         cloud_flag = 1;
         printk(KERN_ALERT "CloudUSB f_mass before loop amount:%d\n", amount);
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
-        printk(KERN_ALERT "CloudUSB f_mass after loop1\n");
-        printk(KERN_ALERT "CloudUSB f_mass after loop buf: %s\n", buff);
         printk(KERN_ALERT "CloudUSB f_mass after loop nread: %d\n", nread);
         printk(KERN_ALERT "CloudUSB f_mass after loop buf: %p\n", bh->buf);
+        printk(KERN_ALERT "CloudUSB f_mass after loop buf: %s\n", buff);
         strncpy(bh->buf, buff, nread);
-        printk(KERN_ALERT "CloudUSB f_mass after loop2\n");
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
         /* Perform the read */
 //        file_offset_tmp = file_offset;
