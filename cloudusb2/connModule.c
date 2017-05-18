@@ -65,13 +65,13 @@ unsigned int		amount = 0;
 loff_t			file_offset = 0;
 ssize_t			nread = 0;
 
-char *buf = NULL;
+char *buff = NULL;
 
 EXPORT_SYMBOL(amount);
 EXPORT_SYMBOL(file_offset);
 EXPORT_SYMBOL(nread);
 EXPORT_SYMBOL(cloud_flag);
-EXPORT_SYMBOL(buf);
+EXPORT_SYMBOL(buff);
 
 //EXPORT_SYMBOL(send_signals);
 
@@ -109,7 +109,7 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         case RETURN_FILE:
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE\n");
             files = (struct return_file *)(arg);
-            buf = files->buf;
+            buff = files->buf;
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
             nread = files->nread;
             printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE2\n");
