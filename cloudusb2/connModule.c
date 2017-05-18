@@ -58,7 +58,7 @@ int cloud_open(struct inode *inode, struct file *file)
 //extern char *buf;
 //extern ssize_t nread;
 
-struct block_request request;
+//struct block_request request;
 
 int cloud_flag = 1;
 unsigned int		amount = 0;
