@@ -660,7 +660,7 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 extern loff_t file_offset;
 extern unsigned int amount;
 extern int cloud_flag;
-extern unsigned char buff[16384];
+extern char __user *buff;
 extern ssize_t nread;
 
 
@@ -741,23 +741,28 @@ static int do_read(struct fsg_common *common)
         
         //send_signals();
         cloud_flag = 1;
-        printk(KERN_ALERT "CloudUSB f_mass before loop amount:%d\n", amount);
+        
+        printk(KERN_ALERT "CloudUSB file_offset:%lld\n", file_offset);
+        printk(KERN_ALERT "CloudUSB amount:%u\n", amount);
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
-        printk(KERN_ALERT "CloudUSB f_mass after loop nread: %d\n", nread);
+        printk(KERN_ALERT "CloudUSB nread: %zd\n", nread);
         printk(KERN_ALERT "CloudUSB f_mass after loop buff s: ");
         int i;
-        for(i=0;i<nread;i++){
-            printk(KERN_CONT "%02x ", buff[i]);
-        }
-        printk(KERN_ALERT "\n");
-        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
-        memcpy(bh->buf, buff, sizeof(unsigned char)*nread);
-        printk(KERN_ALERT "CloudUSB f_mass after memcpy : ");
-        int i;
-        for(i=0;i<nread;i++){
-            printk(KERN_CONT "%02x ", bh->buf[i]);
-        }
-        printk(KERN_ALERT "\n");
+//        for(i=0;i<nread;i++){
+//            printk(KERN_CONT "%02x ", buff[i]);
+//        }
+//        printk(KERN_ALERT "\n");
+//        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
+        bh->buf = buff;
+//        memcpy(bh->buf, buff, sizeof(unsigned char)*nread);
+        ///
+//        printk(KERN_ALERT "CloudUSB f_mass bh->buf : ");
+//        for(i=0;i<amount;i++){
+//            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
+//        }
+//        printk(KERN_ALERT "\n");
+        ///
+        
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
         /* Perform the read */
 //        file_offset_tmp = file_offset;

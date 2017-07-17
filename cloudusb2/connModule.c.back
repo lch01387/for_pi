@@ -66,7 +66,7 @@ unsigned int		amount = 0;
 loff_t			file_offset = 0;
 ssize_t			nread = 0;
 
-char __user *buff;
+char buff[16384];
 
 EXPORT_SYMBOL(amount);
 EXPORT_SYMBOL(file_offset);
@@ -113,16 +113,15 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             //buff = files->buf;
             printk(KERN_ALERT "CloudUSB RETURN_FILE files->buf: ");
             int i;
-//            printk(KERN_ALERT "%d\n", files->nread);
-            for(i=0;i<files->nread;i++){
-                printk(KERN_CONT "%02x ", files->buf[i]);
+            printk(KERN_ALERT "%d\n", files->nread);
+            for(i=0;i<512;i++){
+                printk(KERN_CONT "_%d_%02x ", i, files->buf[i]);
             }
             printk(KERN_ALERT "\n");
-//            memcpy(buff, files->buf, sizeof(unsigned char)*files->nread);
-            buff = files->buf;
-//            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
+            memcpy(buff, files->buf, sizeof(unsigned char)*files->nread);
+            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE1\n");
             nread = files->nread;
-//            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE2\n");
+            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE2\n");
             cloud_flag = 0;
             break;
     }
