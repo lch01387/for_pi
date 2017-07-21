@@ -31,3 +31,6 @@ kernel_module 디렉토리에서..
 구름USB 때는 꼭 connModule을 먼저 적재한 이후 가젯드라이버를 적재해야 한다.
 1. kernel_module 디렉토리에서 sudo insmod connModule.ko
 2. 어느 디렉토리에서나 sudo modprobe g_mass_storage file=/piusb.bin stall=0
+3. sudo modprobe usb_f_mass_storage
+4. sh makenode.sh
+
