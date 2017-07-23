@@ -26,9 +26,9 @@ kernel_module 디렉토리에서..
 
 4. sh compile.sh 명령어를 실행.
 
-5. sudo reboot하면 설정 끝
+5. sudo reboot하면 초기설정 끝
 
-이후 구름USB 작동법
+구름USB 작동법
 sh /home/pi/cloudusb/boot1.sh 실행
 이후 UserPid~ 와 STRUCT ADDRESS~가 출력되면
 sh /home/pi/cloudusb/boot2.sh 를 실행한다.
