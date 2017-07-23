@@ -746,7 +746,7 @@ static int do_read(struct fsg_common *common)
         printk(KERN_ALERT "CloudUSB amount:%u\n", amount);
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
         printk(KERN_ALERT "CloudUSB nread: %zd\n", nread);
-        printk(KERN_ALERT "CloudUSB f_mass after loop buff s: ");
+        printk(KERN_ALERT "CloudUSB f_mass after loop buff s: %02x", buff);
         int i;
 //        for(i=0;i<nread;i++){
 //            printk(KERN_CONT "%02x ", buff[i]);
