@@ -131,8 +131,8 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
     printk(KERN_ALERT "CloudUSB_con after wait\n");
     inits->amount = amount;
     inits->file_offset = file_offset;
+    printk(KERN_ALERT "CloudUSB_con inits->file_offset: %lld\n", inits->file_offset);
     printk(KERN_ALERT "CloudUSB_con inits->amount: %u\n", inits->amount);
-    printk(KERN_ALERT "CloudUSB_con inits->file_offset: %z\n", inits->file_offset);
     send_sig_info(SIGUSR1, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
     return 0;
 }
