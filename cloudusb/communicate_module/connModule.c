@@ -85,11 +85,11 @@ int user_pid;
 
 long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
-    printk(KERN_ALERT "CloudUSB ioctl called\n");
+    printk(KERN_ALERT "CloudUSB_con ioctl called\n");
     switch (cmd)
     {
         case INIT:
-            printk(KERN_ALERT "CloudUSB ioctl get INIT\n");
+            printk(KERN_ALERT "CloudUSB_con ioctl get INIT\n");
             inits = (struct module_init *)(arg);
             user_pid = inits->pid;
             memset(&info, 0 ,sizeof(struct siginfo));
@@ -100,18 +100,18 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             t = pid_task(find_vpid(user_pid), PIDTYPE_PID);
             rcu_read_unlock();
             if(t == NULL){
-                printk(KERN_ALERT "CloudUSB no such pid\n");
+                printk(KERN_ALERT "CloudUSB_con no such pid\n");
                 return -ENODEV;
             }
-            printk(KERN_ALERT "CloudUSB init success\n");
+            printk(KERN_ALERT "CloudUSB_con init success\n");
             cloud_flag = 0;
 //          send_sig_info(SIGCONT, &info, t);
             break;
         case RETURN_FILE:
-            printk(KERN_ALERT "CloudUSB ioctl get RETURN_FILE\n");
+            printk(KERN_ALERT "CloudUSB_con ioctl get RETURN_FILE\n");
             files = (struct return_file *)(arg);
             //buff = files->buf;
-            printk(KERN_ALERT "CloudUSB RETURN_FILE files->buf: ");
+            printk(KERN_ALERT "CloudUSB_con RETURN_FILE files->buf: ");
             int i;
 //            printk(KERN_ALERT "%d\n", files->nread);
             for(i=0;i<files->nread;i++){
@@ -126,12 +126,13 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             cloud_flag = 0;
             break;
     }
-    printk(KERN_ALERT "CloudUSB before loop\n");
+    printk(KERN_ALERT "CloudUSB_con before wait\n");
     while(!cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 블록요청 들어올때까지 기다림.
-    printk(KERN_ALERT "CloudUSB after loop1\n");
+    printk(KERN_ALERT "CloudUSB_con after wait\n");
     inits->amount = amount;
-    printk(KERN_ALERT "CloudUSB after loop2\n");
     inits->file_offset = file_offset;
+    printk(KERN_ALERT "CloudUSB_con inits->amount: %u\n", inits->amount);
+    printk(KERN_ALERT "CloudUSB_con inits->file_offset: %z\n", inits->file_offset);
     send_sig_info(SIGUSR1, &info, t); // 필요한정보 구조체에 넣은후 블록요청 받았다고 유저프로그램에 알려주었다.
     return 0;
 }
