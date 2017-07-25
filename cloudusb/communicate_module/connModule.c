@@ -111,7 +111,8 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             printk(KERN_ALERT "CloudUSB_con ioctl get RETURN_FILE\n");
             files = (struct return_file *)(arg);
             printk(KERN_ALERT "CloudUSB_con received file_buf: %p\n", files->buf);
-            printk(KERN_ALERT "CloudUSB_con received file_nread: %u\n", files->nread);
+            printk(KERN_ALERT "CloudUSB_con received file_nread: %d\n", files->nread);
+            printk(KERN_ALERT "CloudUSB_con received file_content: ", files->nread);
             int i;
             for(i=0;i<files->nread;i++){
                 printk(KERN_ALERT "%02x ", files->buf[i]);
