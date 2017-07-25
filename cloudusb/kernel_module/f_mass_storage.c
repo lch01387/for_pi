@@ -741,19 +741,22 @@ static int do_read(struct fsg_common *common)
         
         //send_signals();
         cloud_flag = 1;
-        
-        printk(KERN_ALERT "CloudUSB file_offset:%lld\n", file_offset);
-        printk(KERN_ALERT "CloudUSB amount:%u\n", amount);
+        printk(KERN_ALERT "CloudUSB_fmass receive new block request\n");
+        printk(KERN_ALERT "CloudUSB_fmass file_offset:%lld\n", file_offset);
+        printk(KERN_ALERT "CloudUSB_fmass amount:%u\n", amount);
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
-        printk(KERN_ALERT "CloudUSB nread: %zd\n", nread);
-        printk(KERN_ALERT "CloudUSB f_mass after loop buff s: %02x", buff);
-        int i;
+//        printk(KERN_ALERT "CloudUSB_fmass receive file from userprogram");
+//        printk(KERN_ALERT "CloudUSB_fmass receive file_offset: %lld", buff);
+//        printk(KERN_ALERT "CloudUSB_fmass receive file_nread: %u\n", nread);
+        
+        bh->buf = buff;
+//        int i;
 //        for(i=0;i<nread;i++){
 //            printk(KERN_CONT "%02x ", buff[i]);
 //        }
 //        printk(KERN_ALERT "\n");
 //        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
-        bh->buf = buff;
+        
 //        memcpy(bh->buf, buff, sizeof(unsigned char)*nread);
         ///
 //        printk(KERN_ALERT "CloudUSB f_mass bh->buf : ");
