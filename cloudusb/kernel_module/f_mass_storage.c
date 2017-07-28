@@ -1910,24 +1910,29 @@ static int do_scsi_command(struct fsg_common *common)
 	switch (common->cmnd[0]) {
 
 	case INQUIRY:
+        printk(KERN_ALERT "CloudUSB_scsi INQUIRY\n");
 		common->data_size_from_cmnd = common->cmnd[4];
 		reply = check_command(common, 6, DATA_DIR_TO_HOST,
 				      (1<<4), 0,
 				      "INQUIRY");
 		if (reply == 0)
 			reply = do_inquiry(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi INQUIRY over\n");
 		break;
 
 	case MODE_SELECT:
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SELECT\n");
 		common->data_size_from_cmnd = common->cmnd[4];
 		reply = check_command(common, 6, DATA_DIR_FROM_HOST,
 				      (1<<1) | (1<<4), 0,
 				      "MODE SELECT(6)");
 		if (reply == 0)
 			reply = do_mode_select(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SELECT over\n");
 		break;
 
 	case MODE_SELECT_10:
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SELECT_10\n");
 		common->data_size_from_cmnd =
 			get_unaligned_be16(&common->cmnd[7]);
 		reply = check_command(common, 10, DATA_DIR_FROM_HOST,
@@ -1935,18 +1940,22 @@ static int do_scsi_command(struct fsg_common *common)
 				      "MODE SELECT(10)");
 		if (reply == 0)
 			reply = do_mode_select(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SELECT_10 over\n");
 		break;
 
 	case MODE_SENSE:
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SENSE\n");
 		common->data_size_from_cmnd = common->cmnd[4];
 		reply = check_command(common, 6, DATA_DIR_TO_HOST,
 				      (1<<1) | (1<<2) | (1<<4), 0,
 				      "MODE SENSE(6)");
 		if (reply == 0)
 			reply = do_mode_sense(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SENSE over\n");
 		break;
 
 	case MODE_SENSE_10:
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SENSE_10\n");
 		common->data_size_from_cmnd =
 			get_unaligned_be16(&common->cmnd[7]);
 		reply = check_command(common, 10, DATA_DIR_TO_HOST,
@@ -1954,18 +1963,22 @@ static int do_scsi_command(struct fsg_common *common)
 				      "MODE SENSE(10)");
 		if (reply == 0)
 			reply = do_mode_sense(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi MODE_SENSE_10 over\n");
 		break;
 
 	case ALLOW_MEDIUM_REMOVAL:
+        printk(KERN_ALERT "CloudUSB_scsi ALLOW_MEDIUM_REMOVAL\n");
 		common->data_size_from_cmnd = 0;
 		reply = check_command(common, 6, DATA_DIR_NONE,
 				      (1<<4), 0,
 				      "PREVENT-ALLOW MEDIUM REMOVAL");
 		if (reply == 0)
 			reply = do_prevent_allow(common);
+        printk(KERN_ALERT "CloudUSB_scsi ALLOW_MEDIUM_REMOVAL over\n");
 		break;
 
 	case READ_6:
+        printk(KERN_ALERT "CloudUSB_scsi READ_6\n");
 		i = common->cmnd[4];
 		common->data_size_from_cmnd = (i == 0) ? 256 : i;
 		reply = check_command_size_in_blocks(common, 6,
@@ -1974,9 +1987,11 @@ static int do_scsi_command(struct fsg_common *common)
 				      "READ(6)");
 		if (reply == 0)
 			reply = do_read(common);
+        printk(KERN_ALERT "CloudUSB_scsi READ_6 over\n");
 		break;
 
 	case READ_10:
+        printk(KERN_ALERT "CloudUSB_scsi READ_10\n");
 		common->data_size_from_cmnd =
 				get_unaligned_be16(&common->cmnd[7]);
 		reply = check_command_size_in_blocks(common, 10,
@@ -1985,9 +2000,11 @@ static int do_scsi_command(struct fsg_common *common)
 				      "READ(10)");
 		if (reply == 0)
 			reply = do_read(common);
+        printk(KERN_ALERT "CloudUSB_scsi READ_10 over\n");
 		break;
 
 	case READ_12:
+        printk(KERN_ALERT "CloudUSB_scsi READ_12\n");
 		common->data_size_from_cmnd =
 				get_unaligned_be32(&common->cmnd[6]);
 		reply = check_command_size_in_blocks(common, 12,
@@ -1996,18 +2013,22 @@ static int do_scsi_command(struct fsg_common *common)
 				      "READ(12)");
 		if (reply == 0)
 			reply = do_read(common);
+        printk(KERN_ALERT "CloudUSB_scsi READ_12 over\n");
 		break;
 
 	case READ_CAPACITY:
+        printk(KERN_ALERT "CloudUSB_scsi READ_CAPACITY\n");
 		common->data_size_from_cmnd = 8;
 		reply = check_command(common, 10, DATA_DIR_TO_HOST,
 				      (0xf<<2) | (1<<8), 1,
 				      "READ CAPACITY");
 		if (reply == 0)
 			reply = do_read_capacity(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi READ_CAPACITY over\n");
 		break;
 
 	case READ_HEADER:
+        printk(KERN_ALERT "CloudUSB_scsi READ_HEADER\n");
 		if (!common->curlun || !common->curlun->cdrom)
 			goto unknown_cmnd;
 		common->data_size_from_cmnd =
@@ -2017,9 +2038,11 @@ static int do_scsi_command(struct fsg_common *common)
 				      "READ HEADER");
 		if (reply == 0)
 			reply = do_read_header(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi READ_HEADER over\n");
 		break;
 
 	case READ_TOC:
+        printk(KERN_ALERT "CloudUSB_scsi READ_TOC\n");
 		if (!common->curlun || !common->curlun->cdrom)
 			goto unknown_cmnd;
 		common->data_size_from_cmnd =
@@ -2029,9 +2052,11 @@ static int do_scsi_command(struct fsg_common *common)
 				      "READ TOC");
 		if (reply == 0)
 			reply = do_read_toc(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi READ_TOC over\n");
 		break;
 
 	case READ_FORMAT_CAPACITIES:
+        printk(KERN_ALERT "CloudUSB_scsi READ_FORMAT_CAPACITIES\n");
 		common->data_size_from_cmnd =
 			get_unaligned_be16(&common->cmnd[7]);
 		reply = check_command(common, 10, DATA_DIR_TO_HOST,
@@ -2039,40 +2064,49 @@ static int do_scsi_command(struct fsg_common *common)
 				      "READ FORMAT CAPACITIES");
 		if (reply == 0)
 			reply = do_read_format_capacities(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi READ_FORMAT_CAPACITIES over\n");
 		break;
 
 	case REQUEST_SENSE:
+        printk(KERN_ALERT "CloudUSB_scsi REQUEST_SENSE\n");
 		common->data_size_from_cmnd = common->cmnd[4];
 		reply = check_command(common, 6, DATA_DIR_TO_HOST,
 				      (1<<4), 0,
 				      "REQUEST SENSE");
 		if (reply == 0)
 			reply = do_request_sense(common, bh);
+        printk(KERN_ALERT "CloudUSB_scsi REQUEST_SENSE\n");
 		break;
 
 	case START_STOP:
+        printk(KERN_ALERT "CloudUSB_scsi START_STOP\n");
 		common->data_size_from_cmnd = 0;
 		reply = check_command(common, 6, DATA_DIR_NONE,
 				      (1<<1) | (1<<4), 0,
 				      "START-STOP UNIT");
 		if (reply == 0)
 			reply = do_start_stop(common);
+        printk(KERN_ALERT "CloudUSB_scsi START_STOP over\n");
 		break;
 
 	case SYNCHRONIZE_CACHE:
+        printk(KERN_ALERT "CloudUSB_scsi SYNCHRONIZE_CACHE\n");
 		common->data_size_from_cmnd = 0;
 		reply = check_command(common, 10, DATA_DIR_NONE,
 				      (0xf<<2) | (3<<7), 1,
 				      "SYNCHRONIZE CACHE");
 		if (reply == 0)
 			reply = do_synchronize_cache(common);
+        printk(KERN_ALERT "CloudUSB_scsi SYNCHRONIZE_CACHE over\n");
 		break;
 
 	case TEST_UNIT_READY:
+        printk(KERN_ALERT "CloudUSB_scsi TEST_UNIT_READY\n");
 		common->data_size_from_cmnd = 0;
 		reply = check_command(common, 6, DATA_DIR_NONE,
 				0, 1,
 				"TEST UNIT READY");
+        printk(KERN_ALERT "CloudUSB_scsi TEST_UNIT_READY over\n");
 		break;
 
 	/*
@@ -2080,15 +2114,18 @@ static int do_scsi_command(struct fsg_common *common)
 	 * support a minimal version: BytChk must be 0.
 	 */
 	case VERIFY:
+        printk(KERN_ALERT "CloudUSB_scsi VERIFY\n");
 		common->data_size_from_cmnd = 0;
 		reply = check_command(common, 10, DATA_DIR_NONE,
 				      (1<<1) | (0xf<<2) | (3<<7), 1,
 				      "VERIFY");
 		if (reply == 0)
 			reply = do_verify(common);
+        printk(KERN_ALERT "CloudUSB_scsi VERIFY over\n");
 		break;
 
 	case WRITE_6:
+        printk(KERN_ALERT "CloudUSB_scsi WRITE_6\n");
 		i = common->cmnd[4];
 		common->data_size_from_cmnd = (i == 0) ? 256 : i;
 		reply = check_command_size_in_blocks(common, 6,
@@ -2097,9 +2134,11 @@ static int do_scsi_command(struct fsg_common *common)
 				      "WRITE(6)");
 		if (reply == 0)
 			reply = do_write(common);
+        printk(KERN_ALERT "CloudUSB_scsi WRITE_6 over\n");
 		break;
 
 	case WRITE_10:
+        printk(KERN_ALERT "CloudUSB_scsi WRITE_10\n");
 		common->data_size_from_cmnd =
 				get_unaligned_be16(&common->cmnd[7]);
 		reply = check_command_size_in_blocks(common, 10,
@@ -2108,9 +2147,11 @@ static int do_scsi_command(struct fsg_common *common)
 				      "WRITE(10)");
 		if (reply == 0)
 			reply = do_write(common);
+        printk(KERN_ALERT "CloudUSB_scsi WRITE_10 over\n");
 		break;
 
 	case WRITE_12:
+        printk(KERN_ALERT "CloudUSB_scsi WRITE_12\n");
 		common->data_size_from_cmnd =
 				get_unaligned_be32(&common->cmnd[6]);
 		reply = check_command_size_in_blocks(common, 12,
@@ -2119,6 +2160,7 @@ static int do_scsi_command(struct fsg_common *common)
 				      "WRITE(12)");
 		if (reply == 0)
 			reply = do_write(common);
+        printk(KERN_ALERT "CloudUSB_scsi WRITE_12 over\n");
 		break;
 
 	/*
