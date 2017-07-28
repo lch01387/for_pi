@@ -2075,7 +2075,7 @@ static int do_scsi_command(struct fsg_common *common)
 				      "REQUEST SENSE");
 		if (reply == 0)
 			reply = do_request_sense(common, bh);
-        printk(KERN_ALERT "CloudUSB_scsi REQUEST_SENSE\n");
+        printk(KERN_ALERT "CloudUSB_scsi REQUEST_SENSE over\n");
 		break;
 
 	case START_STOP:
