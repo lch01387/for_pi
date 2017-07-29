@@ -683,18 +683,6 @@ static int do_read(struct fsg_common *common)
 	if (unlikely(amount_left == 0))
 		return -EIO;		/* No default reply */
     
-    ///////////////////////
-    cloud_flag = 1;
-    while(cloud_flag){sleep(0.001)}
-    /* Send this buffer and go read some more */
-    bh->inreq->zero = 0;
-    if (!start_in_transfer(common, bh))
-    /* Don't know what to do if common->fsg is NULL */
-        return -EIO;
-    common->next_buffhd_to_fill = bh->next;
-    //////////////////////
-    // 어떤 코드가 필요한코드인지 어떤 코드가 지워야할 코드인지.
-    
 	for (;;) {
 		/*
 		 * Figure out how much we need to read:
