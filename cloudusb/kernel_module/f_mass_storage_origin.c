@@ -718,19 +718,22 @@ static int do_read(struct fsg_common *common)
         /* Perform the read */
         file_offset_tmp = file_offset;
         
-        printk(KERN_ALERT "CloudUSB fmass new block request");
+        printk(KERN_ALERT "CloudUSB fmass new block request\n");
         printk(KERN_ALERT "CloudUSB fmass received file_offset_tmp: %lld\n", file_offset_tmp);
         printk(KERN_ALERT "CloudUSB fmass received amount: %u\n", amount);
         printk(KERN_ALERT "CloudUSB fmass received file_content: ");
+        
+        
+        nread = vfs_read(curlun->filp,
+                         (char __user *)bh->buf,
+                         amount, &file_offset_tmp);
+        
         int i;
         printk(KERN_ALERT "CloudUSB f_mass buff content : ");
         for(i=0;i<amount;i++){
             printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
         }
         
-        nread = vfs_read(curlun->filp,
-                         (char __user *)bh->buf,
-                         amount, &file_offset_tmp);
         VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
               (unsigned long long)file_offset, (int)nread);
         if (signal_pending(current))
