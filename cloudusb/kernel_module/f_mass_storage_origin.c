@@ -223,6 +223,8 @@
 #include <linux/sched.h> // timeout
 #include <linux/string.h>
 
+#include <linux/delay.h>
+
 #include "configfs.h"
 
 
@@ -728,11 +730,15 @@ static int do_read(struct fsg_common *common)
                          (char __user *)bh->buf,
                          amount, &file_offset_tmp);
         
+        msleep(50);
+        
         int i;
         printk(KERN_ALERT "CloudUSB f_mass buff content : ");
         for(i=0;i<amount;i++){
             printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
         }
+        
+        msleep(50);
         
         VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
               (unsigned long long)file_offset, (int)nread);
