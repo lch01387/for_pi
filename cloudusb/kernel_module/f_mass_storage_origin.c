@@ -219,6 +219,9 @@
 #include <linux/usb/ch9.h>
 #include <linux/usb/gadget.h>
 #include <linux/usb/composite.h>
+#include <linux/string.h>
+#include <linux/sched.h> // timeout
+#include <linux/string.h>
 
 #include "configfs.h"
 
@@ -636,22 +639,41 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 
 
 /*-------------------------------------------------------------------------*/
+//extern void send_signals(void);
 
-int cloud_flag = 0;
-u32			amount_left;
-loff_t			file_offset;
-char buf[4000];
+//int cloud_flag = 0;
+//unsigned int		amount = 0;
+//loff_t			file_offset = 0;
+//ssize_t			nread = 0;
+//
+//char *buf = NULL;
+//
+//// export할것: amount, file_offset, cloud_flag, buf,
+//EXPORT_SYMBOL(amount);
+//EXPORT_SYMBOL(file_offset);
+//EXPORT_SYMBOL(nread);
+//
+//EXPORT_SYMBOL(cloud_flag);
+//EXPORT_SYMBOL(buf);
+
+
+extern loff_t file_offset;
+extern unsigned int amount;
+extern int cloud_flag;
+extern char __user *buff;
+extern ssize_t nread;
+
+
+
 
 static int do_read(struct fsg_common *common)
 {
 	struct fsg_lun		*curlun = common->curlun;
 	u32			lba;
 	struct fsg_buffhd	*bh;
-    unsigned int		amount;
+    u32			amount_left;
 	int			rc;
-	loff_t	    file_offset_tmp;
-	
-	ssize_t			nread;
+	//loff_t	    file_offset_tmp;
 
 	/*
 	 * Get the starting Logical Block Address and check that it's
@@ -717,29 +739,40 @@ static int do_read(struct fsg_common *common)
 			break;
 		}
         
-		/* Perform the read */
-        export(amount)
-        export(offset)
+        //send_signals();
+        cloud_flag = 1;
+        printk(KERN_ALERT "CloudUSB_fmass receive new block request\n");
+        printk(KERN_ALERT "CloudUSB_fmass file_offset:%lld\n", file_offset);
+        printk(KERN_ALERT "CloudUSB_fmass amount:%u\n", amount);
+        while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
+//        printk(KERN_ALERT "CloudUSB_fmass receive file from userprogram");
+//        printk(KERN_ALERT "CloudUSB_fmass receive file_offset: %lld", buff);
+//        printk(KERN_ALERT "CloudUSB_fmass receive file_nread: %u\n", nread);
         
-		file_offset_tmp = file_offset;
+        bh->buf = buff;
+//        int i;
+//        for(i=0;i<nread;i++){
+//            printk(KERN_CONT "%02x ", buff[i]);
+//        }
+//        printk(KERN_ALERT "\n");
+//        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
         
-        printk(KERN_ALERT "CloudUSB fmass new block request");
-        printk(KERN_ALERT "CloudUSB fmass received file_offset_tmp: %lld\n", file_offset_tmp);
-        printk(KERN_ALERT "CloudUSB fmass received amount: %u\n", amount);
-        printk(KERN_ALERT "CloudUSB fmass received file_content: ");
-        int i;
-        printk(KERN_ALERT "CloudUSB f_mass buff content : ");
-        for(i=0;i<amount;i++){
-            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
-        }
+//        memcpy(bh->buf, buff, sizeof(unsigned char)*nread);
+        ///
+//        printk(KERN_ALERT "CloudUSB f_mass bh->buf : ");
+//        for(i=0;i<amount;i++){
+//            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
+//        }
+//        printk(KERN_ALERT "\n");
+        ///
         
-        // 유저 프로그램에 블록요청하는지점
-        // bh->buf에 strncpy로 가져온값을 그대로 복사.
-		nread = vfs_read(curlun->filp,
-				 (char __user *)bh->buf,
-				 amount, &file_offset_tmp);
+        // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
+        /* Perform the read */
+//        file_offset_tmp = file_offset;
+//		nread = vfs_read(curlun->filp,
+//				 (char __user *)bh->buf,
+//				 amount, &file_offset_tmp);
         // buf + 실제읽어온 size도 유저쪽에서 갖고옴
-//        nread = 읽어온 길이;
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
@@ -1078,9 +1111,21 @@ static int do_verify(struct fsg_common *common)
 			curlun->info_valid = 1;
 			break;
 		}
-
+        
+        
 		/* Perform the read */
 		file_offset_tmp = file_offset;
+        
+        printk(KERN_ALERT "CloudUSB fmass new block request");
+        printk(KERN_ALERT "CloudUSB fmass received file_offset_tmp: %lld\n", file_offset_tmp);
+        printk(KERN_ALERT "CloudUSB fmass received amount: %u\n", amount);
+        printk(KERN_ALERT "CloudUSB fmass received file_content: ");
+        int i;
+        printk(KERN_ALERT "CloudUSB f_mass buff content : ");
+        for(i=0;i<amount;i++){
+            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
+        }
+        
 		nread = vfs_read(curlun->filp,
 				(char __user *) bh->buf,
 				amount, &file_offset_tmp);
