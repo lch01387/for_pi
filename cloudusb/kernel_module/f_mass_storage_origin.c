@@ -639,191 +639,144 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 
 
 /*-------------------------------------------------------------------------*/
-//extern void send_signals(void);
-
-//int cloud_flag = 0;
-//unsigned int		amount = 0;
-//loff_t			file_offset = 0;
-//ssize_t			nread = 0;
-//
-//char *buf = NULL;
-//
-//// export할것: amount, file_offset, cloud_flag, buf,
-//EXPORT_SYMBOL(amount);
-//EXPORT_SYMBOL(file_offset);
-//EXPORT_SYMBOL(nread);
-//
-//EXPORT_SYMBOL(cloud_flag);
-//EXPORT_SYMBOL(buf);
-
-
-extern loff_t file_offset;
-extern unsigned int amount;
-extern int cloud_flag;
-extern char __user *buff;
-extern ssize_t nread;
-
-
-
 
 static int do_read(struct fsg_common *common)
 {
-	struct fsg_lun		*curlun = common->curlun;
-	u32			lba;
-	struct fsg_buffhd	*bh;
+    struct fsg_lun		*curlun = common->curlun;
+    u32			lba;
+    struct fsg_buffhd	*bh;
+    int			rc;
     u32			amount_left;
-	int			rc;
-	//loff_t	    file_offset_tmp;
-
-	/*
-	 * Get the starting Logical Block Address and check that it's
-	 * not too big.
-	 */
-	if (common->cmnd[0] == READ_6)
-		lba = get_unaligned_be24(&common->cmnd[1]);
-	else {
-		lba = get_unaligned_be32(&common->cmnd[2]);
-
-		/*
-		 * We allow DPO (Disable Page Out = don't save data in the
-		 * cache) and FUA (Force Unit Access = don't read from the
-		 * cache), but we don't implement them.
-		 */
-		if ((common->cmnd[1] & ~0x18) != 0) {
-			curlun->sense_data = SS_INVALID_FIELD_IN_CDB;
-			return -EINVAL;
-		}
-	}
-	if (lba >= curlun->num_sectors) {
-		curlun->sense_data = SS_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
-		return -EINVAL;
-	}
-	file_offset = ((loff_t) lba) << curlun->blkbits;
-
-	/* Carry out the file reads */
-	amount_left = common->data_size_from_cmnd;
-	if (unlikely(amount_left == 0))
-		return -EIO;		/* No default reply */
+    loff_t			file_offset, file_offset_tmp;
+    unsigned int		amount;
+    ssize_t			nread;
     
-	for (;;) {
-		/*
-		 * Figure out how much we need to read:
-		 * Try to read the remaining amount.
-		 * But don't read more than the buffer size.
-		 * And don't try to read past the end of the file.
-		 */
-		amount = min(amount_left, FSG_BUFLEN);
-		amount = min((loff_t)amount,
-			     curlun->file_length - file_offset);
-
-		/* Wait for the next buffer to become available */
-		bh = common->next_buffhd_to_fill;
-		while (bh->state != BUF_STATE_EMPTY) {
-			rc = sleep_thread(common, false);
-			if (rc)
-				return rc;
-		}
-
-		/*
-		 * If we were asked to read past the end of file,
-		 * end with an empty buffer.
-		 */
-		if (amount == 0) {
-			curlun->sense_data =
-					SS_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
-			curlun->sense_data_info =
-					file_offset >> curlun->blkbits;
-			curlun->info_valid = 1;
-			bh->inreq->length = 0;
-			bh->state = BUF_STATE_FULL;
-			break;
-		}
+    /*
+     * Get the starting Logical Block Address and check that it's
+     * not too big.
+     */
+    if (common->cmnd[0] == READ_6)
+        lba = get_unaligned_be24(&common->cmnd[1]);
+    else {
+        lba = get_unaligned_be32(&common->cmnd[2]);
         
-        //send_signals();
-        cloud_flag = 1;
-        printk(KERN_ALERT "CloudUSB_fmass receive new block request\n");
-        printk(KERN_ALERT "CloudUSB_fmass file_offset:%lld\n", file_offset);
-        printk(KERN_ALERT "CloudUSB_fmass amount:%u\n", amount);
-        while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
-//        printk(KERN_ALERT "CloudUSB_fmass receive file from userprogram");
-//        printk(KERN_ALERT "CloudUSB_fmass receive file_offset: %lld", buff);
-//        printk(KERN_ALERT "CloudUSB_fmass receive file_nread: %u\n", nread);
+        /*
+         * We allow DPO (Disable Page Out = don't save data in the
+         * cache) and FUA (Force Unit Access = don't read from the
+         * cache), but we don't implement them.
+         */
+        if ((common->cmnd[1] & ~0x18) != 0) {
+            curlun->sense_data = SS_INVALID_FIELD_IN_CDB;
+            return -EINVAL;
+        }
+    }
+    if (lba >= curlun->num_sectors) {
+        curlun->sense_data = SS_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
+        return -EINVAL;
+    }
+    file_offset = ((loff_t) lba) << curlun->blkbits;
+    
+    /* Carry out the file reads */
+    amount_left = common->data_size_from_cmnd;
+    if (unlikely(amount_left == 0))
+        return -EIO;		/* No default reply */
+    
+    for (;;) {
+        /*
+         * Figure out how much we need to read:
+         * Try to read the remaining amount.
+         * But don't read more than the buffer size.
+         * And don't try to read past the end of the file.
+         */
+        amount = min(amount_left, FSG_BUFLEN);
+        amount = min((loff_t)amount,
+                     curlun->file_length - file_offset);
         
-        bh->buf = buff;
-//        int i;
-//        for(i=0;i<nread;i++){
-//            printk(KERN_CONT "%02x ", buff[i]);
-//        }
-//        printk(KERN_ALERT "\n");
-//        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
+        /* Wait for the next buffer to become available */
+        bh = common->next_buffhd_to_fill;
+        while (bh->state != BUF_STATE_EMPTY) {
+            rc = sleep_thread(common, false);
+            if (rc)
+                return rc;
+        }
         
-//        memcpy(bh->buf, buff, sizeof(unsigned char)*nread);
-        ///
-//        printk(KERN_ALERT "CloudUSB f_mass bh->buf : ");
-//        for(i=0;i<amount;i++){
-//            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
-//        }
-//        printk(KERN_ALERT "\n");
-        ///
+        /*
+         * If we were asked to read past the end of file,
+         * end with an empty buffer.
+         */
+        if (amount == 0) {
+            curlun->sense_data =
+            SS_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE;
+            curlun->sense_data_info =
+            file_offset >> curlun->blkbits;
+            curlun->info_valid = 1;
+            bh->inreq->length = 0;
+            bh->state = BUF_STATE_FULL;
+            break;
+        }
         
-        // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
         /* Perform the read */
-//        file_offset_tmp = file_offset;
-//		nread = vfs_read(curlun->filp,
-//				 (char __user *)bh->buf,
-//				 amount, &file_offset_tmp);
-        // buf + 실제읽어온 size도 유저쪽에서 갖고옴
+        file_offset_tmp = file_offset;
         
-		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
-		      (unsigned long long)file_offset, (int)nread);
-		if (signal_pending(current))
-			return -EINTR;
-        //
-		if (nread < 0) {
-			LDBG(curlun, "error in file read: %d\n", (int)nread);
-			nread = 0;
-		} else if (nread < amount) {
-			LDBG(curlun, "partial file read: %d/%u\n",
-			     (int)nread, amount);
-			nread = round_down(nread, curlun->blksize);
-		}
-        // 유저쪽에서 오류났을때
-        nread = amount;
-		file_offset  += nread;
-		amount_left  -= nread;
-		common->residue -= nread;
+        printk(KERN_ALERT "CloudUSB fmass new block request");
+        printk(KERN_ALERT "CloudUSB fmass received file_offset_tmp: %lld\n", file_offset_tmp);
+        printk(KERN_ALERT "CloudUSB fmass received amount: %u\n", amount);
+        printk(KERN_ALERT "CloudUSB fmass received file_content: ");
+        int i;
+        printk(KERN_ALERT "CloudUSB f_mass buff content : ");
+        for(i=0;i<amount;i++){
+            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
+        }
         
-		/*
-		 * Except at the end of the transfer, nread will be
-		 * equal to the buffer size, which is divisible by the
-		 * bulk-in maxpacket size.
-		 */
-		bh->inreq->length = nread;
-		bh->state = BUF_STATE_FULL;
-
-		/* If an error occurred, report it and its position */
-		if (nread < amount) {
-			curlun->sense_data = SS_UNRECOVERED_READ_ERROR;
-			curlun->sense_data_info =
-					file_offset >> curlun->blkbits;
-			curlun->info_valid = 1;
-			break;
-		}
-
-		if (amount_left == 0)
-			break;		/* No more left to read */
-
-		/* Send this buffer and go read some more */
-		bh->inreq->zero = 0;
-        ////////////////////////////////////////////////////////////
+        nread = vfs_read(curlun->filp,
+                         (char __user *)bh->buf,
+                         amount, &file_offset_tmp);
+        VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
+              (unsigned long long)file_offset, (int)nread);
+        if (signal_pending(current))
+            return -EINTR;
         
-		if (!start_in_transfer(common, bh))
-			/* Don't know what to do if common->fsg is NULL */
-			return -EIO;
-		common->next_buffhd_to_fill = bh->next;
-	}
-
-	return -EIO;		/* No default reply */
+        if (nread < 0) {
+            LDBG(curlun, "error in file read: %d\n", (int)nread);
+            nread = 0;
+        } else if (nread < amount) {
+            LDBG(curlun, "partial file read: %d/%u\n",
+                 (int)nread, amount);
+            nread = round_down(nread, curlun->blksize);
+        }
+        file_offset  += nread;
+        amount_left  -= nread;
+        common->residue -= nread;
+        
+        /*
+         * Except at the end of the transfer, nread will be
+         * equal to the buffer size, which is divisible by the
+         * bulk-in maxpacket size.
+         */
+        bh->inreq->length = nread;
+        bh->state = BUF_STATE_FULL;
+        
+        /* If an error occurred, report it and its position */
+        if (nread < amount) {
+            curlun->sense_data = SS_UNRECOVERED_READ_ERROR;
+            curlun->sense_data_info =
+            file_offset >> curlun->blkbits;
+            curlun->info_valid = 1;
+            break;
+        }
+        
+        if (amount_left == 0)
+            break;		/* No more left to read */
+        
+        /* Send this buffer and go read some more */
+        bh->inreq->zero = 0;
+        if (!start_in_transfer(common, bh))
+        /* Don't know what to do if common->fsg is NULL */
+            return -EIO;
+        common->next_buffhd_to_fill = bh->next;
+    }
+    
+    return -EIO;		/* No default reply */
 }
 
 
@@ -1116,15 +1069,6 @@ static int do_verify(struct fsg_common *common)
 		/* Perform the read */
 		file_offset_tmp = file_offset;
         
-        printk(KERN_ALERT "CloudUSB fmass new block request");
-        printk(KERN_ALERT "CloudUSB fmass received file_offset_tmp: %lld\n", file_offset_tmp);
-        printk(KERN_ALERT "CloudUSB fmass received amount: %u\n", amount);
-        printk(KERN_ALERT "CloudUSB fmass received file_content: ");
-        int i;
-        printk(KERN_ALERT "CloudUSB f_mass buff content : ");
-        for(i=0;i<amount;i++){
-            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
-        }
         
 		nread = vfs_read(curlun->filp,
 				(char __user *) bh->buf,
