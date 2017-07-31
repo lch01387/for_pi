@@ -45,8 +45,8 @@ g_mass_storage
 
 3. sudo reboot
 4. 이미지파일 만들기
-sudo dd if=/dev/zero of=/piusb.bin bs=1024 count=102400
-sudo mkdosfs /piusb.bin
+sudo dd if=/dev/zero of=/piusb.bin bs=1M count=1K
+sudo mkdosfs -F 32 -s 8 -S 512 /piusb.bin
 ==> FAT32 100MB 이미지파일이 생성됨.
 
 4.적재하는법.
@@ -55,14 +55,18 @@ sudo modprobe g_mass_storage file=/piusb.bin stall=0
 
 
 구글드라이브 인증받기.(ssh로 접속후 진행권장)
+cd ~/cloudeusb/googledrive/ 로 이동
 sudo apt-get install python-pip -y
 sudo pip install --upgrade google-api-python-client
 python list.py --noauth_local_webserver
 나오는 주소 브라우저에 복붙하고 한울이계정으로 로그인후 나오는코드 써주면됨
 
+유저프로그램 컴파일
+cd ~/MyCloudUSB/MYFAT/MYFAT/MYFAT/ 이동 후
+make 실행.
 
 라즈베리파이 커널소스코드 다운로드
-1. clone한 프로젝트내의 cloudusb/script/rpisrc_install.sh 실행
+1. ~/cloudeusb/script 디렉토리의 rpisrc_install.sh 실행
 2. sudo apt-get install bc
 3. sudo apt-get install libncurses5-dev
 4. sudo reboot
