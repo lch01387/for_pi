@@ -1,6 +1,6 @@
 git clone https://github.com/lch01387/for_pi
 
-소스 다운받으면 cloudusb디렉토리에 communicate_module과 kernel_module파일이 존재한다.
+소스 다운받으면 for_pi/cloudusb디렉토리에 communicate_module과 kernel_module파일이 존재한다.
 kernel_module : 가젯드라이버 소스수정 및 컴파일
 communicate_module : 가젯드라이버와 유저프로그램의 통신 담당모듈
 test_codes : 참고 코드
@@ -18,7 +18,7 @@ communicate_module 디렉토리에서..
 - 캐릭터노드 잘만들어졌는지 확인하기위해 ls -al /dev/CloudUSB 실행. 한줄나오면됨.
 
 kernel_module 디렉토리에서..
-1.  Makefile을 열어서 4번째줄 KBUILD_EXTRA_SYMBOLS 뒤의 경로가 communicate_module 디렉토리의 심볼파일을 제대로 가르키도록 수정한다.
+1.  두개의 Makefile을 열어서 각각 4번째줄 KBUILD_EXTRA_SYMBOLS 뒤의 경로가 communicate_module 디렉토리의 심볼파일을 제대로 가르키도록 수정한다.
 
 2. sh movefile.sh 명령어를 실행한다.
 
