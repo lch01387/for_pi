@@ -788,7 +788,6 @@ static int do_read(struct fsg_common *common)
 			nread = round_down(nread, curlun->blksize);
 		}
         // 유저쪽에서 오류났을때
-        nread = amount;
 		file_offset  += nread;
 		amount_left  -= nread;
 		common->residue -= nread;
