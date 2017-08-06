@@ -27,7 +27,7 @@ struct module_init{
 
 struct return_file{
     unsigned char *buf;
-    ssize_t nread;
+    int nread;
 };
 
 MODULE_LICENSE("GPL");
