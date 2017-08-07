@@ -119,7 +119,10 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 //            }
             printk(KERN_ALERT "\n");
             printk(KERN_ALERT "CloudUSB_con---------------------------------------------------------\n");
-            buff = files->buf;
+            
+            //buff = files->buf;
+            memcpy(buff, files->buf, files->nread);
+            
             nread = files->nread;
             cloud_flag = 0;
             break;

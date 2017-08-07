@@ -741,6 +741,7 @@ static int do_read(struct fsg_common *common)
         
         
         //send_signals();
+        buff = bh->buf;
         cloud_flag = 1;
         printk(KERN_ALERT "CloudUSB_fmass receive new block request\n");
         
@@ -781,7 +782,6 @@ static int do_read(struct fsg_common *common)
         // vfs_read()대신 유저프로그램에서 버퍼내용을 쓴 시작주소를 bh->buf에 써준다.
         //bh->inreq->buf = buff;
         //bh->buf = buff;
-        memcpy(bh->buf, buff, nread);
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
