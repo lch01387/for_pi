@@ -739,9 +739,14 @@ static int do_read(struct fsg_common *common)
 			break;
 		}
         
+        
         //send_signals();
         cloud_flag = 1;
         printk(KERN_ALERT "CloudUSB_fmass receive new block request\n");
+        
+        printk(KERN_ALERT "CloudUSB_fmass bh->buf: %p\n", bh->buf);
+        printk(KERN_ALERT "CloudUSB_fmass bh->inreq->buf: %p\n", bh->inreq->buf);
+        
         printk(KERN_ALERT "CloudUSB_fmass file_offset:%lld\n", file_offset);
         printk(KERN_ALERT "CloudUSB_fmass amount:%u\n", amount);
         while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
@@ -774,8 +779,9 @@ static int do_read(struct fsg_common *common)
         // buf + 실제읽어온 size도 유저쪽에서 갖고옴
         
         // vfs_read()대신 유저프로그램에서 버퍼내용을 쓴 시작주소를 bh->buf에 써준다.
-        bh->inreq->buf = buff;
+        //bh->inreq->buf = buff;
         bh->buf = buff;
+        
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
