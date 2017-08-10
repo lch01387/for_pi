@@ -768,6 +768,11 @@ static int do_read(struct fsg_common *common)
 //		nread = vfs_read(curlun->filp,
 //				 (char __user *)bh->buf,
 //				 amount, &file_offset_tmp);
+        printk(KERN_ALERT "CloudUSB_fmass buff content: ");
+        int i;
+        for(i=0;i<nread;i++){
+            printk(KERN_CONT "%02x ", buff[i]);
+        }
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
