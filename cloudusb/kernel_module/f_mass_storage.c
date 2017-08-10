@@ -762,26 +762,12 @@ static int do_read(struct fsg_common *common)
 //        printk(KERN_ALERT "\n");
 //        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
         
-//        memcpy(bh->buf, buff, sizeof(unsigned char)*nread);
-        ///
-//        printk(KERN_ALERT "CloudUSB f_mass bh->buf : ");
-//        for(i=0;i<amount;i++){
-//            printk(KERN_CONT "%02x ", ((char __user *)(bh->buf))[i]);
-//        }
-//        printk(KERN_ALERT "\n");
-        ///
-        
         // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
         /* Perform the read */
 //      file_offset_tmp = file_offset;
 //		nread = vfs_read(curlun->filp,
 //				 (char __user *)bh->buf,
 //				 amount, &file_offset_tmp);
-        // buf + 실제읽어온 size도 유저쪽에서 갖고옴
-        
-        // vfs_read()대신 유저프로그램에서 버퍼내용을 쓴 시작주소를 bh->buf에 써준다.
-        //bh->inreq->buf = buff;
-        //bh->buf = buff;
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
@@ -796,7 +782,6 @@ static int do_read(struct fsg_common *common)
 			     (int)nread, amount);
 			nread = round_down(nread, curlun->blksize);
 		}
-        // 유저쪽에서 오류났을때
         
 		file_offset  += nread;
 		amount_left  -= nread;

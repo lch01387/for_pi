@@ -96,7 +96,6 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             info.si_signo = SIGUSR1;
             info.si_code = SI_QUEUE;
             rcu_read_lock();
-//            t = find_task_by_vpid(user_pid);
             t = pid_task(find_vpid(user_pid), PIDTYPE_PID);
             rcu_read_unlock();
             if(t == NULL){
@@ -105,7 +104,6 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             }
             printk(KERN_ALERT "CloudUSB_con init success\n");
             cloud_flag = 0;
-//            send_sig_info(SIGCONT, &info, t);
             break;
         case RETURN_FILE:
             printk(KERN_ALERT "CloudUSB_con ioctl get RETURN_FILE\n");
@@ -118,16 +116,8 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
                 printk(KERN_CONT "%02x ", files->buf[i]);
             }
             printk(KERN_ALERT "\n");
-            printk(KERN_ALERT "CloudUSB_con---------------------------------------------------------\n");
             
-            //buff = files->buf;
-            printk(KERN_ALERT "CloudUSB_con received buff: %d\n", strlen(buff));
-            printk(KERN_ALERT "CloudUSB_con received files->buf: %d\n", strlen(files->buf));
             memcpy(buff, files->buf, files->nread);
-            printk(KERN_ALERT "CloudUSB_con memcpy buff: ");
-            for(i=0;i<files->nread;i++){
-                printk(KERN_CONT "%02x ", buff[i]);
-            }
             
             nread = files->nread;
             cloud_flag = 0;
