@@ -127,7 +127,7 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             printk(KERN_ALERT "CloudUSB_con memcpy buff: ");
             int i;
             for(i=0;i<files->nread;i++){
-                printk(KERN_CONT "%02x ", buff);
+                printk(KERN_CONT "%02x ", buff[i]);
             }
             
             nread = files->nread;
