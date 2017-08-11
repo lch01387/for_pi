@@ -773,6 +773,7 @@ static int do_read(struct fsg_common *common)
         for(i=0;i<nread;i++){
             printk(KERN_CONT "%02x ", buff[i]);
         }
+        printk(KERN_ALERT "\n");
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
