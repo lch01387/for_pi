@@ -116,7 +116,7 @@ long cloud_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
                 printk(KERN_CONT "%02x ", files->buf[i]);
             }
             printk(KERN_ALERT "\n");
-            printk(KERN_ALERT "print %d words\n", i);
+            msleep(50);
             
             memcpy(buff, files->buf, files->nread);
             
