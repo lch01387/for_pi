@@ -15,6 +15,7 @@
 #include <asm/siginfo.h>    //siginfo
 #include <linux/sched.h> // timeout
 #include <linux/rcupdate.h> //rcu_read_lock
+#include <linux/delay.h> // msleep
 
 #define INIT 0
 #define RETURN_FILE 1
