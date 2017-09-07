@@ -637,33 +637,11 @@ static int sleep_thread(struct fsg_common *common, bool can_freeze)
 	return rc;
 }
 
-
-/*-------------------------------------------------------------------------*/
-//extern void send_signals(void);
-
-//int cloud_flag = 0;
-//unsigned int		amount = 0;
-//loff_t			file_offset = 0;
-//ssize_t			nread = 0;
-//
-//char *buf = NULL;
-//
-//// export할것: amount, file_offset, cloud_flag, buf,
-//EXPORT_SYMBOL(amount);
-//EXPORT_SYMBOL(file_offset);
-//EXPORT_SYMBOL(nread);
-//
-//EXPORT_SYMBOL(cloud_flag);
-//EXPORT_SYMBOL(buf);
-
-
 extern loff_t file_offset;
 extern unsigned int amount;
 extern int cloud_flag;
 extern char __user *buff;
 extern ssize_t nread;
-
-
 
 
 static int do_read(struct fsg_common *common)
@@ -673,7 +651,6 @@ static int do_read(struct fsg_common *common)
 	struct fsg_buffhd	*bh;
     u32			amount_left;
 	int			rc;
-	//loff_t	    file_offset_tmp;
 
 	/*
 	 * Get the starting Logical Block Address and check that it's
@@ -739,41 +716,19 @@ static int do_read(struct fsg_common *common)
 			break;
 		}
         
-        
-        //send_signals();
         buff = bh->buf;
         cloud_flag = 1;
         printk(KERN_ALERT "CloudUSB_fmass receive new block request\n");
-        
-        printk(KERN_ALERT "CloudUSB_fmass bh->buf: %p\n", bh->buf);
-        printk(KERN_ALERT "CloudUSB_fmass bh->inreq->buf: %p\n", bh->inreq->buf);
-        
         printk(KERN_ALERT "CloudUSB_fmass file_offset:%lld\n", file_offset);
         printk(KERN_ALERT "CloudUSB_fmass amount:%u\n", amount);
-        while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);} // 유저 프로그램에 블록요청하는지점
-//        printk(KERN_ALERT "CloudUSB_fmass receive file from userprogram");
-//        printk(KERN_ALERT "CloudUSB_fmass receive file_offset: %lld", buff);
-//        printk(KERN_ALERT "CloudUSB_fmass receive file_nread: %u\n", nread);
         
-//        int i;
-//        for(i=0;i<nread;i++){
-//            printk(KERN_CONT "%02x ", buff[i]);
-//        }
-//        printk(KERN_ALERT "\n");
-//        printk(KERN_ALERT "CloudUSB f_mass after loop buff x: %x\n", buff);
+        /* send block request and wait until return file content. no race condition */
+        while(cloud_flag){schedule_timeout_uninterruptible(0.001*HZ);}
+        file_offset_tmp = file_offset;
         
-        // 이 시점의 amount와 offset을 읽어서 유저에게 전달함.
-        /* Perform the read */
-//      file_offset_tmp = file_offset;
-//		nread = vfs_read(curlun->filp,
-//				 (char __user *)bh->buf,
-//				 amount, &file_offset_tmp);
-//        printk(KERN_ALERT "CloudUSB_fmass buff content: ");
-//        int i;
-//        for(i=0;i<nread;i++){
-//            printk(KERN_CONT "%02x ", buff[i]);
-//        }
-        printk(KERN_ALERT "\n");
+        /* perform the read */
+        /* remove this function and send block request */
+        // nread = vfs_read(curlun->filp,(char __user *)bh->buf, amount, &file_offset_tmp);
         
 		VLDBG(curlun, "file read %u @ %llu -> %d\n", amount,
 		      (unsigned long long)file_offset, (int)nread);
